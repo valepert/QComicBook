@@ -25,6 +25,17 @@
 #include "Page.h"
 #include "config.h"
 
+//! directory with QComicBook translations
+static QString translationsDir()
+{
+#ifdef Q_OS_MACOS
+	// inside the app bundle: QComicBook.app/Contents/Resources/i18n
+	return QCoreApplication::applicationDirPath() + "/../Resources/i18n";
+#else
+	return DATADIR "/i18n";
+#endif
+}
+
 int main(int argc, char *argv[])
 {
 	using namespace QComicBook;
@@ -41,7 +52,7 @@ int main(int argc, char *argv[])
         app.installTranslator(&qtTrans);
 
         QTranslator qcomicbookTrans;
-        qcomicbookTrans.load("qcomicbook_" + QLocale::system().name(), DATADIR "/i18n");
+        qcomicbookTrans.load("qcomicbook_" + QLocale::system().name(), translationsDir());
         app.installTranslator(&qcomicbookTrans);
 
 	const QString errcaption = ComicMainWindow::tr("QComicBook error");

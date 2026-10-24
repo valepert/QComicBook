@@ -12,6 +12,25 @@
 	<string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<!-- languages of i18n/*.ts; without this list macOS only offers English to the app -->
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>cs</string>
+		<string>de</string>
+		<string>en</string>
+		<string>es</string>
+		<string>fi</string>
+		<string>fr</string>
+		<string>fr_CA</string>
+		<string>it</string>
+		<string>ko</string>
+		<string>nl</string>
+		<string>pl</string>
+		<string>pt_BR</string>
+		<string>ru</string>
+		<string>uk</string>
+		<string>zh_CN</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
 	<key>CFBundlePackageType</key>

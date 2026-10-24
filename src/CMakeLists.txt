@@ -79,6 +79,16 @@ IF(APPLE)
 		MACOSX_BUNDLE_SHORT_VERSION_STRING ${VERSION}
 		MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION}
 		MACOSX_BUNDLE_COPYRIGHT "(c) Pawel Stolowski 2005-2016, released under GNU GPL v2")
+
+	# translations (built in i18n/) are copied into the bundle's Resources
+	file (GLOB translation_src ${CMAKE_SOURCE_DIR}/i18n/*.ts)
+	FOREACH(ts ${translation_src})
+		GET_FILENAME_COMPONENT(ts_name ${ts} NAME_WE)
+		LIST(APPEND qcomicbook_qm ${CMAKE_BINARY_DIR}/i18n/${ts_name}.qm)
+	ENDFOREACH()
+	ADD_CUSTOM_COMMAND(TARGET qcomicbook POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_BUNDLE_CONTENT_DIR:qcomicbook>/Resources/i18n
+		COMMAND ${CMAKE_COMMAND} -E copy ${qcomicbook_qm} $<TARGET_BUNDLE_CONTENT_DIR:qcomicbook>/Resources/i18n)
 ENDIF()
 
 INSTALL(TARGETS qcomicbook
