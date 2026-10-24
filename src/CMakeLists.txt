@@ -54,10 +54,34 @@ qt6_add_resources(qcomicbook_res ../data/qcomicbook.qrc)
 qt6_wrap_cpp(qcomicbook_moc_src ${qcomicbook_moc_hdrs})
 qt6_wrap_ui(qcomicbook_ui_src ${qcomicbook_ui})
 
-ADD_EXECUTABLE(qcomicbook ${qcomicbook_src} ${qcomicbook_moc_src} ${qcomicbook_ui_src} ${qcomicbook_res})
+IF(APPLE)
+	# application icon, generated from the PNG at build time
+	SET(qcomicbook_icns ${CMAKE_CURRENT_BINARY_DIR}/QComicBook.icns)
+	ADD_CUSTOM_COMMAND(OUTPUT ${qcomicbook_icns}
+		COMMAND sh ${CMAKE_SOURCE_DIR}/data/macos/make-icns.sh ${CMAKE_SOURCE_DIR}/data/qcomicbook.png ${qcomicbook_icns}
+		DEPENDS ${CMAKE_SOURCE_DIR}/data/qcomicbook.png ${CMAKE_SOURCE_DIR}/data/macos/make-icns.sh)
+	SET_SOURCE_FILES_PROPERTIES(${qcomicbook_icns} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+ENDIF()
+
+# MACOSX_BUNDLE builds QComicBook.app on macOS and is ignored elsewhere
+ADD_EXECUTABLE(qcomicbook MACOSX_BUNDLE ${qcomicbook_src} ${qcomicbook_moc_src} ${qcomicbook_ui_src} ${qcomicbook_res} ${qcomicbook_icns})
 ADD_DEPENDENCIES(qcomicbook translations)
 TARGET_LINK_LIBRARIES(qcomicbook Qt6::Widgets Qt6::PrintSupport)
 TARGET_LINK_LIBRARIES(qcomicbook ${POPPLER_LINK_LIBRARIES})
 
-INSTALL(TARGETS qcomicbook DESTINATION bin)
+IF(APPLE)
+	SET_TARGET_PROPERTIES(qcomicbook PROPERTIES
+		OUTPUT_NAME QComicBook
+		MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/data/macos/Info.plist.in
+		MACOSX_BUNDLE_BUNDLE_NAME QComicBook
+		MACOSX_BUNDLE_GUI_IDENTIFIER net.linux-projects.QComicBook
+		MACOSX_BUNDLE_ICON_FILE QComicBook.icns
+		MACOSX_BUNDLE_SHORT_VERSION_STRING ${VERSION}
+		MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION}
+		MACOSX_BUNDLE_COPYRIGHT "(c) Pawel Stolowski 2005-2016, released under GNU GPL v2")
+ENDIF()
+
+INSTALL(TARGETS qcomicbook
+	BUNDLE DESTINATION .
+	RUNTIME DESTINATION bin)
 
