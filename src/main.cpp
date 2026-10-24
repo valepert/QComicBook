@@ -40,6 +40,20 @@ int main(int argc, char *argv[])
 {
 	using namespace QComicBook;
 
+#ifdef Q_OS_MACOS
+	//
+	// apps started from Finder get a minimal PATH: add the Homebrew and MacPorts
+	// directories, so external archivers (7z, rar, ...) installed there are found
+	QByteArray path = qgetenv("PATH");
+	const QList<QByteArray> pathDirs = path.split(':');
+	for (const char *dir: {"/opt/homebrew/bin", "/usr/local/bin", "/opt/local/bin"})
+	{
+		if (!pathDirs.contains(dir))
+			path += QByteArray(":") + dir;
+	}
+	qputenv("PATH", path);
+#endif
+
 	QApplication app(argc, argv);
         app.setApplicationName("QComicBook");
         app.setOrganizationName("PawelStolowski");
