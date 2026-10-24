@@ -17,6 +17,7 @@
 #include <QLibraryInfo>
 #include <QTranslator>
 #include <QLocale>
+#include <QFileOpenEvent>
 #include "ComicMainWindow.h"
 #include "ComicBookSettings.h"
 #include "ComicFrameList.h"
@@ -25,9 +26,55 @@
 #include "Page.h"
 #include "config.h"
 
+//! directory with QComicBook translations
+static QString translationsDir()
+{
+#ifdef Q_OS_MACOS
+	// inside the app bundle: QComicBook.app/Contents/Resources/i18n
+	return QCoreApplication::applicationDirPath() + "/../Resources/i18n";
+#else
+	return DATADIR "/i18n";
+#endif
+}
+
+//! opens files that macOS sends as events (Finder "Open With", drop on the Dock icon)
+class FileOpenFilter: public QObject
+{
+	public:
+		FileOpenFilter(QComicBook::ComicMainWindow *win): QObject(win), m_win(win) {}
+
+	protected:
+		bool eventFilter(QObject *obj, QEvent *e)
+		{
+			if (e->type() == QEvent::FileOpen)
+			{
+				m_win->open(static_cast<QFileOpenEvent*>(e)->file());
+				return true;
+			}
+			return QObject::eventFilter(obj, e);
+		}
+
+	private:
+		QComicBook::ComicMainWindow *m_win;
+};
+
 int main(int argc, char *argv[])
 {
 	using namespace QComicBook;
+
+#ifdef Q_OS_MACOS
+	//
+	// apps started from Finder get a minimal PATH: add the Homebrew and MacPorts
+	// directories, so external archivers (7z, rar, ...) installed there are found
+	QByteArray path = qgetenv("PATH");
+	const QList<QByteArray> pathDirs = path.split(':');
+	for (const char *dir: {"/opt/homebrew/bin", "/usr/local/bin", "/opt/local/bin"})
+	{
+		if (!pathDirs.contains(dir))
+			path += QByteArray(":") + dir;
+	}
+	qputenv("PATH", path);
+#endif
 
 	QApplication app(argc, argv);
         app.setApplicationName("QComicBook");
@@ -41,7 +88,7 @@ int main(int argc, char *argv[])
         app.installTranslator(&qtTrans);
 
         QTranslator qcomicbookTrans;
-        qcomicbookTrans.load("qcomicbook_" + QLocale::system().name(), DATADIR "/i18n");
+        qcomicbookTrans.load("qcomicbook_" + QLocale::system().name(), translationsDir());
         app.installTranslator(&qcomicbookTrans);
 
 	const QString errcaption = ComicMainWindow::tr("QComicBook error");
@@ -63,6 +110,7 @@ int main(int argc, char *argv[])
 	ComicMainWindow *win = new ComicMainWindow(NULL);
 	//app.setMainWidget(win);
 	win->show();
+	app.installEventFilter(new FileOpenFilter(win));
 
 	//
 	// show splashscreen

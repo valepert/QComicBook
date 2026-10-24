@@ -16,6 +16,8 @@
 #include <QPixmap>
 #include <QElapsedTimer>
 #include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QtMath>
 #include "ComicBookDebug.h"
 
 using namespace QComicBook;
@@ -84,7 +86,10 @@ QVariant Lens::itemChange(GraphicsItemChange change, const QVariant &value)
 	{
 		if (!m_pixmap)
 		{
-		    m_pixmap = QSharedPointer<QPixmap>(new QPixmap(m_size.width()/m_ratio, m_size.height()/m_ratio));
+		    const QList<QGraphicsView*> views = scene()->views();
+		    const qreal dpr = views.isEmpty() ? 1.0 : views.first()->devicePixelRatio();
+		    m_pixmap = QSharedPointer<QPixmap>(new QPixmap(qCeil(m_size.width()/m_ratio*dpr), qCeil(m_size.height()/m_ratio*dpr)));
+		    m_pixmap->setDevicePixelRatio(dpr);
                 }
 
                 //

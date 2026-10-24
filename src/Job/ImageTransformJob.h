@@ -16,6 +16,7 @@
 #include "JobKey.h"
 #include "../ViewPropertiesData.h"
 #include "Counted.h"
+#include <QSize>
 
 class QImage;
 class QTransform;
@@ -29,6 +30,7 @@ namespace QComicBook
         virtual ~ImageTransformJob();
 
         void setSize(int w, int h);
+        void setDevicePixelRatio(qreal ratio);
         void setMatrix(const QTransform &m);
         void setKey(const JobKey &k);
         const JobKey& key() const;
@@ -38,10 +40,17 @@ namespace QComicBook
         virtual void execute() = 0;
         virtual QImage getResult() const = 0;
 
+        //! size in device pixels of a w x h (logical) result image
+        static QSize pixelSize(const QSize &size, qreal ratio);
+
     protected:
+        //! creates result image of m_width x m_height logical size, at m_ratio device pixel ratio
+        QImage* createResultImage() const;
+
         JobKey m_key;
         int m_width;
         int m_height;
+        qreal m_ratio; //!< device pixel ratio of the screen the result is shown on
         ViewPropertiesData m_props; //!< view properties
         QTransform *m_matrix;
     };
