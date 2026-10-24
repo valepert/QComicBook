@@ -17,6 +17,7 @@
 #include <QLibraryInfo>
 #include <QTranslator>
 #include <QLocale>
+#include <QFileOpenEvent>
 #include "ComicMainWindow.h"
 #include "ComicBookSettings.h"
 #include "ComicFrameList.h"
@@ -35,6 +36,27 @@ static QString translationsDir()
 	return DATADIR "/i18n";
 #endif
 }
+
+//! opens files that macOS sends as events (Finder "Open With", drop on the Dock icon)
+class FileOpenFilter: public QObject
+{
+	public:
+		FileOpenFilter(QComicBook::ComicMainWindow *win): QObject(win), m_win(win) {}
+
+	protected:
+		bool eventFilter(QObject *obj, QEvent *e)
+		{
+			if (e->type() == QEvent::FileOpen)
+			{
+				m_win->open(static_cast<QFileOpenEvent*>(e)->file());
+				return true;
+			}
+			return QObject::eventFilter(obj, e);
+		}
+
+	private:
+		QComicBook::ComicMainWindow *m_win;
+};
 
 int main(int argc, char *argv[])
 {
@@ -88,6 +110,7 @@ int main(int argc, char *argv[])
 	ComicMainWindow *win = new ComicMainWindow(NULL);
 	//app.setMainWidget(win);
 	win->show();
+	app.installEventFilter(new FileOpenFilter(win));
 
 	//
 	// show splashscreen
