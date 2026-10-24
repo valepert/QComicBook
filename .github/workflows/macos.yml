@@ -1,0 +1,88 @@
+# Builds QComicBook.app for Apple silicon and packs it into a .dmg, which is
+# available as a downloadable artifact of each run.
+#
+# Pushing a release tag (X.Y.Z, e.g. 0.10.0) on master also creates a draft
+# GitHub Release with the .dmg attached, and the tag's ChangeLog entry as notes.
+name: macOS app
+
+on:
+  push:
+    branches: [master]
+    tags: ['[0-9]+.[0-9]+.[0-9]+']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dmg:
+    # the oldest supported Apple silicon runner: Homebrew's libraries are
+    # built for the runner's macOS, which becomes the app's minimum version
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0  # full history, to check that release tags are on master
+
+      - name: Check release tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tag="$GITHUB_REF_NAME"
+          version=$(sed -n 's/^SET(VERSION "\(.*\)")$/\1/p' CMakeLists.txt)
+          if [ "$tag" != "$version" ]; then
+            echo "::error::tag $tag doesn't match VERSION \"$version\" in CMakeLists.txt"
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/master; then
+            echo "::error::tag $tag is not on master"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: brew install pkgconf qtbase qttools qttranslations poppler-qt6
+
+      - name: Build
+        run: |
+          export PKG_CONFIG_PATH="$(brew --prefix poppler-qt6)/lib/pkgconfig"
+          cmake -S . -B build
+          cmake --build build -j"$(sysctl -n hw.ncpu)"
+
+      - name: Package
+        run: sh data/macos/make-dmg.sh build
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: QComicBook-macOS-arm64
+          path: build/QComicBook-*.dmg
+          if-no-files-found: error
+
+  release:
+    needs: dmg
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: QComicBook-macOS-arm64
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="$GITHUB_REF_NAME"
+          # the tag's ChangeLog entry: from its "<date>:  <version>" line to the next empty line
+          awk -v v="$tag" '$2 == v { p = 1 } p && /^[[:space:]]*$/ { exit } p' ChangeLog > entry.txt
+          if [ -s entry.txt ]; then
+            # code block, to keep the ChangeLog layout
+            { echo '```'; cat entry.txt; echo '```'; } > notes.txt
+          else
+            echo "::warning::no ChangeLog entry for $tag"
+            echo "QComicBook $tag" > notes.txt
+          fi
+          gh release create "$tag" QComicBook-*.dmg --draft --verify-tag \
+            --title "QComicBook $tag" --notes-file notes.txt
