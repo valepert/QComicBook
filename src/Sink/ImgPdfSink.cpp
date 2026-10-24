@@ -64,8 +64,10 @@ QImage ImgPdfSink::image(unsigned int num, int &result)
 		Poppler::Page* pdfpage = pdfdoc->page(num).release();
 		if (pdfpage)
 		{
+			// render at physical resolution, so pages stay sharp on high-DPI (e.g. Retina) screens
 			const QScreen *screen = QGuiApplication::primaryScreen();
-			QImage img = pdfpage->renderToImage(screen->logicalDotsPerInchX(), screen->logicalDotsPerInchY());
+			const qreal ratio = screen->devicePixelRatio();
+			QImage img = pdfpage->renderToImage(screen->logicalDotsPerInchX() * ratio, screen->logicalDotsPerInchY() * ratio);
 			delete pdfpage;
 			result = 0;
 			return img;

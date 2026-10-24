@@ -40,8 +40,7 @@ void FrameRedrawJob::execute()
     _DEBUG << key();
 
     delete m_result;
-    m_result = new QImage(m_width, m_height, QImage::Format_ARGB32);
-    m_result->fill(0); // this prevents artifcats/garbage in transparent images
+    m_result = createResultImage();
 
     QPainter p(m_result);
     p.setRenderHint(QPainter::SmoothPixmapTransform, m_props.smoothScaling);

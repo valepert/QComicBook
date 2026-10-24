@@ -181,7 +181,10 @@ void ComicImage::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, Q
     if (m_pixmap)
     {
 //      painter->drawPixmap(opt->rect().x(), opt->rect().y(), *m_pixmap, opt->rect().x()-xoff, opt->rect().y()-yoff, opt->rect().width(), opt->rect().height());
-        painter->drawPixmap(opt->exposedRect, *m_pixmap, opt->exposedRect);
+        // source rectangle is in pixmap (device) pixels
+        const qreal ratio = m_pixmap->devicePixelRatio();
+        const QRectF source(opt->exposedRect.topLeft() * ratio, opt->exposedRect.size() * ratio);
+        painter->drawPixmap(opt->exposedRect, *m_pixmap, source);
     }
 }
 
@@ -193,6 +196,7 @@ void ComicImage::requestRedraw(const QSize& requestedSize, const QTransform &rot
     if (j)
     {
         j->setSize(requestedSize.width(), requestedSize.height());
+        j->setDevicePixelRatio(m_view->devicePixelRatio());
         j->setMatrix(rotationMatrix);
         ImageTransformThread::get()->addJob(j);
     }
@@ -201,9 +205,11 @@ void ComicImage::requestRedraw(const QSize& requestedSize, const QTransform &rot
 void ComicImage::redraw(const QImage &img)
 {
     _DEBUG;
-    if (img.size() == m_scaledSize) // sanity check; should match size requested in requestRedraw(..)
+    // sanity check; should match size requested in requestRedraw(..)
+    if (img.size() == ImageTransformJob::pixelSize(m_scaledSize, img.devicePixelRatio()))
     {
-        if (m_pixmap != NULL && m_pixmap->size() == img.size()) // reuse existing pixmap if of right size
+        // reuse existing pixmap if of right size and pixel ratio
+        if (m_pixmap != NULL && m_pixmap->size() == img.size() && m_pixmap->devicePixelRatio() == img.devicePixelRatio())
         {
             QPainter p(m_pixmap);
             p.drawImage(0, 0, img);
