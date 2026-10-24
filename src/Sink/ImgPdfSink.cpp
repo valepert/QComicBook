@@ -12,7 +12,8 @@
 
 #include "ImgPdfSink.h"
 #include "../Page.h"
-#include <QX11Info>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QFileInfo>
 #include <QMutexLocker>
 
@@ -30,7 +31,7 @@ ImgPdfSink::~ImgPdfSink()
 int ImgPdfSink::open(const QString &path)
 {
 	emit progress(0, 1);
-	pdfdoc = Poppler::Document::load(path);
+	pdfdoc = Poppler::Document::load(path).release();
 	if (!pdfdoc || pdfdoc->isLocked())
 	{
 		delete pdfdoc;
@@ -60,10 +61,11 @@ QImage ImgPdfSink::image(unsigned int num, int &result)
 	QMutexLocker lock(&docmtx);
 	if (pdfdoc)
 	{
-		Poppler::Page* pdfpage = pdfdoc->page(num);
+		Poppler::Page* pdfpage = pdfdoc->page(num).release();
 		if (pdfpage)
 		{
-			QImage img = pdfpage->renderToImage(QX11Info::appDpiX(), QX11Info::appDpiY()); //TODO: use QScreen
+			const QScreen *screen = QGuiApplication::primaryScreen();
+			QImage img = pdfpage->renderToImage(screen->logicalDotsPerInchX(), screen->logicalDotsPerInchY());
 			delete pdfpage;
 			result = 0;
 			return img;

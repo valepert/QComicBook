@@ -16,7 +16,7 @@
 #include <QDialog>
 #include <QFont>
 
-class QStringList;
+#include <QStringList>
 class QTabWidget;
 
 namespace QComicBook

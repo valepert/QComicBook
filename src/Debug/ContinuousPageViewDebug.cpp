@@ -50,9 +50,9 @@ void ContinuousPageViewDebug::refreshClicked()
 
 void ContinuousPageViewDebug::setZoomFactor(double v)
 {
-    QMatrix m;
+    QTransform m;
     m.scale(v, v);
-    view->setMatrix(m);
+    view->setTransform(m);
 }
 
 void ContinuousPageViewDebug::setView(ContinuousPageView *view)

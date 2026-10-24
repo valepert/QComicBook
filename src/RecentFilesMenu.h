@@ -15,7 +15,7 @@
 
 #include <QMenu>
 
-class QStringList;
+#include <QStringList>
 class QAction;
 
 namespace QComicBook
