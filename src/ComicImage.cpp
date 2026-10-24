@@ -185,7 +185,7 @@ void ComicImage::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, Q
     }
 }
 
-void ComicImage::requestRedraw(const QSize& requestedSize, const QMatrix &rotationMatrix)
+void ComicImage::requestRedraw(const QSize& requestedSize, const QTransform &rotationMatrix)
 {
     ViewProperties &props(m_view->properties());
 

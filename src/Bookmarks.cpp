@@ -61,7 +61,7 @@ bool Bookmarks::save()
 	{
 		QTextStream str(&f);
 		foreach (Bookmark *b, blist)
-			str << b->getName() << endl << b->getPage() << endl;
+			str << b->getName() << Qt::endl << b->getPage() << Qt::endl;
 		f.close();
                 changed = false;
 		return true;

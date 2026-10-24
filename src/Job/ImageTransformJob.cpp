@@ -12,7 +12,7 @@
 
 #include "ImageTransformJob.h"
 #include "ComicBookDebug.h"
-#include <QMatrix>
+#include <QTransform>
 
 using namespace QComicBook;
 
@@ -42,10 +42,10 @@ void ImageTransformJob::setSize(int w, int h)
     m_height = h;
 }
 
-void ImageTransformJob::setMatrix(const QMatrix &m)
+void ImageTransformJob::setMatrix(const QTransform &m)
 {
     delete m_matrix;
-    m_matrix = new QMatrix(m);
+    m_matrix = new QTransform(m);
 }
 
 void ImageTransformJob::setViewProperties(const ViewPropertiesData &props)

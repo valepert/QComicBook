@@ -170,7 +170,7 @@ void SimplePageView::wheelEvent(QWheelEvent *e)
 {
     if (imgLabel)
     {
-        if (e->delta() > 0) //scrolling up
+        if (e->angleDelta().y() > 0) //scrolling up
         {
             if (imgLabel->height() <= height() || (onTop() && ++wheelupcnt > EXTRA_WHEEL_SPIN))
             {
