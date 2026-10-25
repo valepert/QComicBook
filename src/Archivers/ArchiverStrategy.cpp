@@ -71,13 +71,17 @@ void ArchiverStrategy::setListArguments(const QString &command)
     listArgs = command.split(" ", Qt::SkipEmptyParts);
 }
 
-void ArchiverStrategy::setExecutables(const QString &exec1, const QString &exec2)
+void ArchiverStrategy::setExecutables(const QString &exec1, const QString &exec2, const QString &exec3)
 {
     executables.clear();
     executables.append(exec1);
     if (exec2 != QString())
     {
         executables.append(exec2);
+    }
+    if (exec3 != QString())
+    {
+        executables.append(exec3);
     }
 }
 

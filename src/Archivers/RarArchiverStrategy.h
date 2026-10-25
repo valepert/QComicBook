@@ -27,7 +27,9 @@ namespace QComicBook
         virtual QList<ArchiverHint> getHints() const;
 
     private:
-        bool nonfree_unrar;
+        static bool isNonfreeUnrar();
+
+        bool free_unrar;
     };
 }
 

@@ -21,7 +21,7 @@ using namespace QComicBook;
 using Utility::which;
 
 RarArchiverStrategy::RarArchiverStrategy()
-    : ArchiverStrategy("rar", FileSignature(0, "\x52\x61\x72\x21", 4)), nonfree_unrar(false)
+    : ArchiverStrategy("rar", FileSignature(0, "\x52\x61\x72\x21", 4)), free_unrar(false)
 {
 }
 
@@ -29,11 +29,35 @@ RarArchiverStrategy::~RarArchiverStrategy()
 {
 }
 
+bool RarArchiverStrategy::isNonfreeUnrar()
+{
+    FILE *f;
+    bool nonfree = false;
+    //
+    // determine which unrar it is - free or non-free
+    if ((f = popen("unrar", "r")) != NULL)
+    {
+        QRegularExpression regexp("^UNRAR.+freeware");
+        for (QTextStream s(f); !s.atEnd(); )
+        {
+            if (regexp.match(s.readLine()).hasMatch())
+            {
+                nonfree = true;
+                break;
+            }
+        }
+        pclose(f);
+    }
+    return nonfree;
+}
+
 void RarArchiverStrategy::configure()
 {
     addExtension(".rar");
     addExtension(".cbr");
-    setExecutables("rar", "unrar");
+    setExecutables("rar", "unrar", "7zz");
+
+    const bool unrar = which("unrar") != QString();
 
     if (which("rar") != QString())
     {
@@ -41,48 +65,38 @@ void RarArchiverStrategy::configure()
         setListArguments("rar lb @F");
         setSupported();
     }
-    else if (which("unrar") != QString())
+    else if (unrar && isNonfreeUnrar())
     {
-        FILE *f;
-        //
-        // now determine which unrar it is - free or non-free
-        if ((f = popen("unrar", "r")) != NULL)
-        {
-            QRegularExpression regexp("^UNRAR.+freeware");
-            for (QTextStream s(f); !s.atEnd(); )
-            {
-                if (regexp.match(s.readLine()).hasMatch())
-                {
-                    nonfree_unrar = true;
-                    break;
-                }
-            }
-            pclose(f);
-            if (nonfree_unrar)
-            {
-                setExtractArguments("unrar x @F");
-                setListArguments("unrar lb @F");
-            }
-            else
-            {
-                setExtractArguments("unrar -x @F");
-                setListArguments("unrar -t @F");
-            }
-            setSupported();
-        }
+        setExtractArguments("unrar x @F");
+        setListArguments("unrar lb @F");
+        setSupported();
+    }
+    else if (which("7zz") != QString()) // 7-Zip, e.g. Homebrew's sevenzip on macOS
+    {
+        setExtractArguments("7zz x @F");
+        setListArguments("7zz l @F");
+        setSupported();
+    }
+    else if (unrar)
+    {
+        setExtractArguments("unrar -x @F");
+        setListArguments("unrar -t @F");
+        setSupported();
+        free_unrar = true;
     }
     else if (which("unrar-free") != QString()) //some distros rename free unrar like this
     {
         setExtractArguments("unrar-free -x @F");
         setListArguments("unrar-free -t @F");
         setSupported();
+        free_unrar = true;
     }
 }
 
 QList<ArchiverHint> RarArchiverStrategy::getHints() const
 {
     QList<ArchiverHint> hints;
-    if (isSupported() && !nonfree_unrar)
+    if (free_unrar)
     {
         hints.append(ArchiverHint(
                          ArchiversConfiguration::tr("Free (opensource) version of unrar was detected. "
