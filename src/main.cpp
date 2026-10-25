@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
         //
         // load translation
         QTranslator qtTrans;
-        qtTrans.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+        qtTrans.load("qt_" + QLocale::system().name(), QLibraryInfo::path(QLibraryInfo::TranslationsPath));
         app.installTranslator(&qtTrans);
 
         QTranslator qcomicbookTrans;

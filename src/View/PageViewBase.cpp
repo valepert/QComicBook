@@ -119,10 +119,11 @@ void PageViewBase::mouseMoveEvent(QMouseEvent *e)
 {
     if (e->buttons())
     {
+        const QPoint pos = e->position().toPoint();
         if (lx >= 0)
         {
-                const int dx = lx - e->x();
-                const int dy = ly - e->y();
+                const int dx = lx - pos.x();
+                const int dy = ly - pos.y();
 
 		QScrollBar *vbar = verticalScrollBar();
 		QScrollBar *hbar = horizontalScrollBar();
@@ -130,8 +131,8 @@ void PageViewBase::mouseMoveEvent(QMouseEvent *e)
 		vbar->setValue(vbar->value() + dy);
 		hbar->setValue(hbar->value() + dx);
         }
-        lx = e->x();
-        ly = e->y();
+        lx = pos.x();
+        ly = pos.y();
     }
     else
     {
