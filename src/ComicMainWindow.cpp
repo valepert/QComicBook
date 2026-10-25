@@ -370,6 +370,7 @@ void ComicMainWindow::setupComicImageView()
         _DEBUG << "disconnecting old view";
         view->disconnect();
         pageLoader->disconnect();
+        viewStack->removeWidget(view);
         view->deleteLater();
     }
 
@@ -408,7 +409,11 @@ void ComicMainWindow::setupComicImageView()
         break;
     }
     
-    setCentralWidget(view);
+    //
+    // the central widget stays the same: replacing it after a dock layout
+    // was restored leaves the new view without room next to the docks
+    viewStack->addWidget(view);
+    viewStack->setCurrentWidget(view);
     view->setFocus();
 
     reconfigureDisplay();

@@ -26,7 +26,7 @@
    <iconset resource="../data/qcomicbook.qrc">
     <normaloff>:/icons/qcomicbook.png</normaloff>:/icons/qcomicbook.png</iconset>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QStackedWidget" name="viewStack"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
