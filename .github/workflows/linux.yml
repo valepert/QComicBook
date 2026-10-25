@@ -1,0 +1,98 @@
+# Builds QComicBook on Linux, checks what `cmake --install` installs, and runs
+# a short headless smoke test.
+name: Linux
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        # 24.04 has Qt 6.4, the minimum version QComicBook requires;
+        # 26.04 has a recent Qt and compiler
+        os: [ubuntu-24.04, ubuntu-26.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y --no-install-recommends install \
+              build-essential cmake pkg-config \
+              qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools \
+              libpoppler-qt6-dev
+
+      - name: Build
+        run: |
+          cmake -S . -B build
+          cmake --build build -j"$(nproc)"
+
+      - name: Install
+        run: |
+          cmake --install build --prefix "$RUNNER_TEMP/install"
+          test -x "$RUNNER_TEMP/install/bin/qcomicbook"
+          translations=$(ls "$RUNNER_TEMP/install/share/qcomicbook/i18n/"*.qm | wc -l)
+          expected=$(ls i18n/*.ts | wc -l)
+          if [ "$translations" -ne "$expected" ]; then
+            echo "::error::installed $translations translations, expected $expected"
+            exit 1
+          fi
+
+      - name: Smoke test
+        run: |
+          # a folder of images
+          pages="$RUNNER_TEMP/pages"
+          mkdir -p "$pages"
+          for i in 1 2 3; do cp data/qcomicbook-splash.png "$pages/page$i.png"; done
+
+          # a one-page PDF (a filled rectangle, no fonts), rendered by Poppler
+          pdf="$RUNNER_TEMP/test.pdf"
+          printf '%%PDF-1.4\n' > "$pdf"
+          offsets=""
+          add() { offsets="$offsets $(wc -c < "$pdf")"; printf '%s\n' "$1" >> "$pdf"; }
+          add '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj'
+          add '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj'
+          add '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R >> endobj'
+          content='0 0 1 rg 100 100 395 642 re f'
+          add "4 0 obj << /Length ${#content} >> stream
+          $content
+          endstream endobj"
+          xref=$(wc -c < "$pdf")
+          {
+            printf 'xref\n0 5\n0000000000 65535 f \n'
+            for offset in $offsets; do printf '%010d 00000 n \n' "$offset"; done
+            printf 'trailer << /Size 5 /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF\n' "$xref"
+          } >> "$pdf"
+
+          # open each without a display, at normal and 2x (high-DPI) scale:
+          # the app must keep running and redraw pages at the expected size
+          for target in "$pages" "$pdf"; do
+            for scale in 1 2; do
+              log="$RUNNER_TEMP/smoke.log"
+              QT_QPA_PLATFORM=offscreen QT_SCALE_FACTOR=$scale ./build/src/qcomicbook "$target" > "$log" 2>&1 &
+              pid=$!
+              sleep 5
+              if ! kill -0 "$pid" 2> /dev/null; then
+                cat "$log"
+                echo "::error::qcomicbook exited early opening $(basename "$target") at scale $scale"
+                exit 1
+              fi
+              kill "$pid"
+              wait "$pid" || true
+              if grep -q "wrong size" "$log"; then
+                cat "$log"
+                echo "::error::pages redrawn at the wrong size opening $(basename "$target") at scale $scale"
+                exit 1
+              fi
+              echo "$(basename "$target") at scale $scale: ok"
+            done
+          done
