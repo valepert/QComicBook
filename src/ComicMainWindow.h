@@ -97,6 +97,7 @@ namespace QComicBook
 			void recentSelected(const QString &fname);
 			void bookmarkSelected(QAction *action);
 			void thumbnailsWindowShown();
+			void repairDockLayout();
 			void savePageAs();
 			void reconfigureDisplay();
 			void currentPageChanged(int n);
