@@ -47,9 +47,6 @@ file (GLOB_RECURSE qcomicbook_hdr *.h *.hpp)
 file (GLOB_RECURSE qcomicbook_src *.cpp)
 file (GLOB_RECURSE qcomicbook_ui *.ui)
 
-SET(FILES_TO_TRANSLATE ${FILES_TO_TRANSLATE} ${qcomicbook_src}
-	${qcomicbook_ui} ${qcomicbook_hdr} PARENT_SCOPE)
-
 qt6_add_resources(qcomicbook_res ../data/qcomicbook.qrc)
 qt6_wrap_cpp(qcomicbook_moc_src ${qcomicbook_moc_hdrs})
 qt6_wrap_ui(qcomicbook_ui_src ${qcomicbook_ui})
