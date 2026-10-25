@@ -7,7 +7,10 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/config.h.cmake ${CMAKE_BINARY_DIR}/config
 
 IF(NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release)
-ELSE()
+ENDIF()
+
+# DEBUG adds the Debug menu and its developer tools
+IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
     ADD_DEFINITIONS( -DDEBUG )
 ENDIF()
 
