@@ -52,18 +52,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # 7-Zip's 7zz opens .cbr and .cb7 comics
+          # 7-Zip's 7zz opens .cbr and .cb7 comics; tar, part of macOS, opens .cbt
           brew install sevenzip
 
           # small sample comics (4 public domain pages) from clach04/sample_reading_media
           samples="$RUNNER_TEMP/samples"
           gh release download v0.2 -R clach04/sample_reading_media -p sample_reading_media.zip -D "$samples"
           echo "7563d57566e6a851e10ce75823751289faad3e013ae124cc5957000731eda592  $samples/sample_reading_media.zip" | shasum -a 256 -c
-          unzip -j -q "$samples/sample_reading_media.zip" '*bobby_make_believe_sample*.cb[r7]' -d "$samples"
+          unzip -j -q "$samples/sample_reading_media.zip" '*bobby_make_believe_sample*.cb[r7t]' -d "$samples"
 
           # open each without a display: the app must keep running and
           # extract all the pages into its temporary folder
-          for comic in "$samples"/*.cb[r7]; do
+          for comic in "$samples"/*.cb[r7t]; do
             name=$(basename "$comic")
             tmp="$RUNNER_TEMP/tmp-$name"
             log="$RUNNER_TEMP/smoke.log"
