@@ -17,6 +17,7 @@
 #include "AceArchiverStrategy.h"
 #include "TargzArchiverStrategy.h"
 #include "Tarbz2ArchiverStrategy.h"
+#include "TarArchiverStrategy.h"
 #include "P7zipArchiverStrategy.h"
 
 using namespace QComicBook;
@@ -34,6 +35,7 @@ ArchiversConfiguration::ArchiversConfiguration()
     archivers.append(new AceArchiverStrategy());
     archivers.append(new TargzArchiverStrategy());
     archivers.append(new Tarbz2ArchiverStrategy());
+    archivers.append(new TarArchiverStrategy());
     archivers.append(new P7zipArchiverStrategy());
 
     foreach (ArchiverStrategy *s, archivers)
