@@ -141,7 +141,6 @@ namespace QComicBook
 			void toggleJapaneseMode(bool f);
 			void reloadPage();
 			void openPrintDialog();
-			void showAboutDonating(bool startup=false);
 
 		public:
 			ComicMainWindow(QWidget *parent);
