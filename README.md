@@ -11,6 +11,14 @@ Features include: automatic unpacking of archive files, full-screen mode, contin
 scrolling mode, double-pages viewing, manga mode, thumbnails view, page scaling,
 mouse or keyboard navigation etc. QComicBook runs on Linux and macOS.
 
+![QComicBook showing two pages side by side, with the thumbnails on the left](docs/screenshots/two-pages.png)
+
+<p>
+  <img src="docs/screenshots/continuous.png" width="32%" alt="Continuous view, with the end of one page and the start of the next">
+  <img src="docs/screenshots/frame.png" width="32%" alt="Frame view, showing a single panel of the page">
+  <img src="docs/screenshots/lens.png" width="32%" alt="The zoom lens magnifying a speech balloon">
+</p>
+
 2. Requirements
 ---------------
 QComicBook requires Qt libraries version >=6.4 (qtcore, qtwidgets, qtprintsupport,
