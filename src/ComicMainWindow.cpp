@@ -86,6 +86,8 @@ ComicMainWindow::ComicMainWindow(QWidget *parent): QMainWindow(parent), currpage
     addDockWidget(Qt::LeftDockWidgetArea, thumbswin);
     connect(thumbswin, SIGNAL(requestedPage(int, bool)), this, SLOT(jumpToPage(int, bool)));
     connect(thumbswin, SIGNAL(shown()), this, SLOT(thumbnailsWindowShown()));
+    // queued, so that the main window has laid out the docks first
+    connect(thumbswin, SIGNAL(shown()), this, SLOT(repairDockLayout()), Qt::QueuedConnection);
 
     //
     // Actions
@@ -370,6 +372,7 @@ void ComicMainWindow::setupComicImageView()
         _DEBUG << "disconnecting old view";
         view->disconnect();
         pageLoader->disconnect();
+        viewStack->removeWidget(view);
         view->deleteLater();
     }
 
@@ -408,7 +411,11 @@ void ComicMainWindow::setupComicImageView()
         break;
     }
     
-    setCentralWidget(view);
+    //
+    // the central widget stays the same: replacing it after a dock layout
+    // was restored leaves the new view without room next to the docks
+    viewStack->addWidget(view);
+    viewStack->setCurrentWidget(view);
     view->setFocus();
 
     reconfigureDisplay();
@@ -563,6 +570,34 @@ void ComicMainWindow::thumbnailsWindowShown()
             {
                 thumbnailLoader->request(i);
             }
+        }
+    }
+}
+
+void ComicMainWindow::repairDockLayout()
+{
+    //
+    // dock layouts saved by older versions may leave the page view almost
+    // no room next to the thumbnails window; give the view its room back
+    if (thumbswin->isFloating())
+    {
+        return;
+    }
+    const Qt::DockWidgetArea area = dockWidgetArea(thumbswin);
+    if (area == Qt::LeftDockWidgetArea || area == Qt::RightDockWidgetArea)
+    {
+        if (viewStack->width() < width() / 4)
+        {
+            _DEBUG << "thumbnails window too wide, resizing";
+            resizeDocks({thumbswin.data()}, {width() / 4}, Qt::Horizontal);
+        }
+    }
+    else if (area == Qt::TopDockWidgetArea || area == Qt::BottomDockWidgetArea)
+    {
+        if (viewStack->height() < height() / 4)
+        {
+            _DEBUG << "thumbnails window too high, resizing";
+            resizeDocks({thumbswin.data()}, {height() / 4}, Qt::Vertical);
         }
     }
 }
