@@ -1,17 +1,20 @@
-.TH "QCOMICBOOK" "1" "july 31, 2005" "Michal Pena (Cyb.org)" ""
+.TH "QCOMICBOOK" "1" "october 26, 2026" "Michal Pena (Cyb.org)" ""
 .SH "NAME"
-QComicBook \- QT viewer for comic book archives (cbr/cbz)
+QComicBook \- QT viewer for comic book archives (cbr/cbz) and PDF files
 .SH "SYNOPSIS"
 .B qcomicbook
 .RI [archive]
 [dir] ...
 .br 
 .SH "DESCRIPTION"
-QComicBook is a viewer for comic book archives containing jpeg/png/xpm/gif images, which aims at convenience and simplicity.
+QComicBook is a viewer for PDF files and comic book archives containing jpeg/png/xpm/gif/bmp images, which aims at convenience and simplicity.
 .PP 
 Features include:
- \- automatic decompression of zip (cbz), rar (cbr), ace (cba), targzipped (cbg) and tarbzip2ped (cbb) archives
+ \- automatic decompression of zip (cbz), rar (cbr), 7z (cb7), ace (cba), targzipped (cbg) and tarbzip2ped (cbb) archives
+ \- PDF files
  \- full\-screen mode
+ \- continuous scrolling and frame\-by\-frame view modes
+ \- zoom lens
  \- two\-pages viewing
  \- page scaling
  \- mouse or keyboard navigation
@@ -21,34 +24,39 @@ Features include:
  \- ... and more
 .PP 
 QComicBook software requirements:
- \- rar/unrar (one of them), unzip, unace and tar (with gzip and bzip2 support compiled\-in) available somewhere in the PATH (e.g. in /usr/bin). If one of them is missing, you won't be able to open some archives
- \- a lot of disk space available in /tmp directory, for handling decompression of archives
+ \- rar/unrar/7zz (one of them), unzip, unace, 7z/7zz (one of them) and tar (with gzip and bzip2 support compiled\-in) available somewhere in the PATH (e.g. in /usr/bin). If one of them is missing, you won't be able to open some archives
+ \- a lot of disk space available in /tmp directory (or the temporary directory set in the settings), for handling decompression of archives
 .SH "MENU"
 \fBFile\fR
 
 File menu provies basic operations for loading comic books:
+ \- Open archive \- open archived images or a PDF file.
  \- Open directory \- open directory containg images.
- \- Open archive \- open archived images.
  \- Recently opened \- list of ten recently opened archives / directories (most recently opened on the top).
- \- Info \- displays information about currenly opened comic book. This includes contents of file_id.diz *.nf o files (if any) as well as memory usage info.
- \- Settings \- allows you to fine\-tune some options.
+ \- Open next, Open previous \- open the next or previous archive (by name) in the directory of the current one.
+ \- Info \- displays information about currenly opened comic book. This includes contents of file_id.diz and *.nfo files (if any).
+ \- Print \- prints pages of the comic book.
+ \- Save page as \- saves the current page as a JPEG or PNG image.
  \- Close \- closes currently opened comic book.
  \- Quit \- quits QComicBook.
 
-QComicBook offers some tunable options, available via Settings menu option. These options include:
+\fBSettings\fR
+
+Settings menu toggles scrollbars, toolbar and statusbar. QComicBook also offers some tunable options, available via Configure QComicBook option of this menu. These options include:
  \- Background color \- the color of the empty area around displayed image.
  \- Hide menubar in fullscreen mode \- menubar may be hidded in fullscreen mode if desired; together with toolbar hiding option, it may give you the whole screen for displaying page contents.
  \- Hide statusbar in fullscreen mode \- statusbar may be hidden in fullscreen mode, giving you even more space.
+ \- Info text font \- the font used in the info dialog.
  \- Small mouse cursor \- toggles small (4x4 pixels) mouse cursor for QComicBook window.
- \- Scaling method \- the algorithm used for image scaling; either Smooth or Fast. Smooth scaling provides best quality, but is slower; it is recommened method unless you have really slow machine.
- \- Cache size \- the number of pages kept in memory. Value of 0 disables caching; 1 has no effect on performance; 2 or more may improve your experience. Keep in mind, that caching may consume a lot of memory \- for example, an 1280x1984 image may take as much as 9Mb of memory!
- \- Preload next page \- enables page preloading in the background. This setting takes effect only for cache size of 3 and greater. It is recommended to enable this option, as it may really improve overall experience.
+ \- Smooth scaling \- the algorithm used for image scaling; smooth scaling provides best quality, but is slower; it is recommened method unless you have really slow machine.
+ \- Cache size \- the memory (in Mb) used to keep pages. Keep in mind, that caching may consume a lot of memory \- for example, an 1280x1984 image may take as much as 9Mb of memory! Auto adjust cache size sets it automatically.
+ \- Preload next page \- enables page preloading in the background. It is recommended to enable this option, as it may really improve overall experience.
  \- Use disk cache for thumbnails \- thumbnails are saved to disk, which speeds up things when loading them later. Set this option on if you tend to open comic books more then once.
  \- Number of days to keep thumbnails \- defines, for how long to keep thumbnails on disk; old thumbnails are deleted when exiting QComicBook. Value of 0 disables purging.
- \- Help browser \- allows to choose between simple built\-in browser (the default) or any other external web browser.
- \- Forward and backward two pages in two\-pages mode.
  \- Open info dialog after opening comic book \- when enabled, info dialog is opened after opening comic book. You may still open this dialog manually with File/Info menu option.
+ \- Show splashscreen.
  \- Confirm exit.
+ \- Temporary directory \- where archives are decompressed.
 
 \fINote: changing cache size takes effect on new comic book.\fR
 
@@ -73,20 +81,23 @@ Other options in this menu:
  \- Fullscreen \- toggles beetween fullscreen and windowed mode; please note, that depending on you settings, menubar may be hidden in fullscreen mode, so to back to windowed mode you need to press F11 or ESC key.
  \- Two pages \- display two pages, side by side, just like when reading normal book.
  \- Japanese mode \- scrolls to top\-right corner on page change; in two pages mode additionaly swaps pages.
+ \- Simple view, Continuous view, Frame view \- one page at a time, all pages in a continuous scroll, or one frame of the page at a time (experimental).
+ \- Lens \- shows a zoom lens under the mouse pointer, which magnifies the page 2, 3, 4 or 8 times.
  \- Thumbnails \- toggles thumbnails window.
- \- Scrollbars \- toggles displaying of scrollbars for large pages; please note that scrollbars will be shown only if necessary.
- \- Toolbar \- toggles displaying of toolbar.
- \- Statusbar \- toggles displaying of statusbar.
 
 Settings in this menu are saved when quitting QComicBook (except for "fullscreen" option).
+
+\fBNavigation\fR
+
+Navigation menu moves to the next or previous page, the next or previous frame (in frame view), 5 pages forward or backward, a given page, the first or last page, and the top or bottom of the page.
 
 \fBBookmarks\fR
 
 Bookmarks menu allows you to bookmark pages in comic books. These bookmarks are however somewhat different than, for example, in any webbrowser and are more similiar to real bookmarks. Each bookmark keeps bookmarked page number (as well as file name), so you can easily start with your comic book from the point, where you last stopped reading.
 
-Two options are available in this menu:
- \- Set bookmark for this comicbook \- creates bookmark for current comic book; existing bookmark for this comic book is deleted.
- \- Remove bookmark for this comicbook \- removes existing bookmark for current comic book; to remove other bookmarks, use Manage bookmarks option.
+Three options are available in this menu:
+ \- Add bookmark \- creates bookmark for current comic book; existing bookmark for this comic book is deleted.
+ \- Remove bookmark \- removes existing bookmark for current comic book; to remove other bookmarks, use Manage bookmarks option.
  \- Manage bookmarks \- opens bookmark manager, where bookmarks can be easily removed.
 
 Below these options you can see the list of currently saved bookmarks. Just click on one of them to go to bookmarked comic book and page.
@@ -94,6 +105,8 @@ Below these options you can see the list of currently saved bookmarks. Just clic
 Keyboard reference:
  \- Ctrl+O         \- Open archive
  \- Ctrl+D         \- Open directory
+ \- Ctrl+N         \- Open next archive
+ \- Ctrl+P         \- Open previous archive
  \- Alt+I          \- Show comicbook info
  \- Arrows         \- Scroll page contents
  \- Shift + Arrows \- Scroll page contents fast
@@ -101,6 +114,9 @@ Keyboard reference:
  \- PageUp         \- Go to previous page
  \- Home           \- Scroll to page top
  \- End            \- Scroll to page bottom
+ \- Ctrl+Home      \- Go to first page
+ \- Ctrl+End       \- Go to last page
+ \- 1 to 9         \- Go to page
  \- Space          \- Scroll down by visible width (hint: enable \fBcontinuous scrolling\fR to jump to next page after reaching bottom)
  \- Backspace      \- Scroll up by visible width (hint: enable \fBcontinuous scrolling\fR)
  \- Alt+O          \- Original image size
@@ -109,26 +125,30 @@ Keyboard reference:
  \- Alt+A          \- Show whole page
  \- Alt+B          \- Best fit
  \- Alt+T          \- Toggle thumbnails window
+ \- Ctrl+T         \- Toggle two pages mode
+ \- Ctrl+J         \- Toggle japanese mode
+ \- L              \- Toggle zoom lens
  \- F11            \- Toggle fullscreen mode
  \- ESC            \- Exit fullscreen mode
+ \- Ctrl+Q         \- Quit
 .SH "INTERNALS"
 Here is some information for people interested in QComicBook internals.
 .PP 
 1. Settings handling
 
-QComicBook keeps settings in ~/.qcomicbook directory within these two files:
- \- qcomicbookrc \- main configuration file
- \- bookmarks \- bookmarks file
+QComicBook keeps settings in these two files:
+ \- ~/.config/PawelStolowski/QComicBook.conf \- main configuration file
+ \- ~/.local/share/PawelStolowski/QComicBook/bookmarks \- bookmarks file
 
 Both files are plain text files and may be edited manually (with caution!), if needed.
 
 2. Thumbnails handling
 
-Thumbnails are stored (if thumbnails disk caching is enabled) in ~/.qcomicbook/cache directory.
+Thumbnails are stored (if thumbnails disk caching is enabled) in ~/.cache/PawelStolowski/QComicBook/thumbs directory.
 
 3. Archives handling
 
-Archived comic books are decompressed to temporary directory (/tmp/qcomicbook\-XXXXX, with XXXXX being some random number). This directory is purged when closing current comic book, opening a new one or quitting QComicBook.
+Archived comic books are decompressed to temporary directory (/tmp/qcomic\-XXXXX, with XXXXX being some random number; the parent directory can be changed in the settings). This directory is purged when closing current comic book, opening a new one or quitting QComicBook.
 .SH "AUTHOR"
 QComicBook was written by Pawel Stolowski <pawel.stolowski@wp.pl>.
 .PP 

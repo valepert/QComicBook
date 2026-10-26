@@ -22,7 +22,6 @@
 #include "Sink/ImgDirSink.h"
 #include "Sink/ImgSinkFactory.h"
 #include "AboutDialog.h"
-#include "ui_DonationDialog.h"
 #include "ComicBookSettings.h"
 #include "History.h"
 #include "ComicBookCfgDialog.h"
@@ -202,7 +201,6 @@ ComicMainWindow::ComicMainWindow(QWidget *parent): QMainWindow(parent), currpage
     connect(actionShowSystemInfo, SIGNAL(triggered()), this, SLOT(showSysInfo()));
     connect(actionShowAbout, SIGNAL(triggered()), this, SLOT(showAbout()));
     connect(actionAboutQt, SIGNAL(triggered()),  this, SLOT(showAboutQt()));
-    connect(actionAboutDonating, SIGNAL(triggered()),  this, SLOT(showAboutDonating()));
 
     //
     // Debug menu
@@ -1008,35 +1006,12 @@ void ComicMainWindow::showSysInfo()
 void ComicMainWindow::showAbout()
 {
         AboutDialog *win = new AboutDialog(this, "About QComicBook",
-                        "QComicBook " VERSION " - comic book viewer for GNU/Linux<br>"
-                        "(c)by Pawel Stolowski 2005-2016<br>"
-                        "released under terms of GNU General Public License<br><br>"
-                        "<a href=\"https://github.com/stolowski/QComicBook\">https://github.com/stolowski/QComicBook</a><br>"
-                        "<a href=\"mailto:stolowski@gmail.com\">stolowski@gmail.com</a>", QPixmap(":/images/qcomicbook-splash.png"));
+                        "QComicBook " VERSION " - comic book viewer<br>"
+                        "Copyright (C) 2005-2016 Pawel Stolowski, 2026 Valerio Perticone<br>"
+                        "Released under the GNU General Public License version 2<br><br>"
+                        "Original project: <a href=\"https://github.com/stolowski/QComicBook\">https://github.com/stolowski/QComicBook</a><br>"
+                        "Current project: <a href=\"https://github.com/valepert/QComicBook\">https://github.com/valepert/QComicBook</a>", QPixmap(":/images/qcomicbook-splash.png"));
         win->show();
-}
-
-void ComicMainWindow::showAboutDonating(bool startup)
-{
-    QDialog dlg;
-    Ui::DonationDialog d;
-    d.setupUi(&dlg);
-    if (startup)
-    {
-    	d.closeBtn->hide();
-    }
-    else
-    {
-	d.remindBtn->hide();
-	d.donateBtn->hide();
-    }
-    if (dlg.exec() == QDialog::Accepted)
-    {
-	if (startup)
-	{
-		cfg->showDonationDialog(false);
-	}
-    }
 }
 
 void ComicMainWindow::showConfigDialog()

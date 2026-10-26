@@ -30,7 +30,6 @@
     <file>wholepage.png</file>
   </qresource>
   <qresource prefix="images">
-    <file>flattr.png</file>
     <file>qcomicbook-splash.png</file>
   </qresource>
 </RCC>
