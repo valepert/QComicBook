@@ -1006,11 +1006,11 @@ void ComicMainWindow::showSysInfo()
 void ComicMainWindow::showAbout()
 {
         AboutDialog *win = new AboutDialog(this, "About QComicBook",
-                        "QComicBook " VERSION " - comic book viewer for GNU/Linux<br>"
-                        "(c)by Pawel Stolowski 2005-2016<br>"
-                        "released under terms of GNU General Public License<br><br>"
-                        "<a href=\"https://github.com/stolowski/QComicBook\">https://github.com/stolowski/QComicBook</a><br>"
-                        "<a href=\"mailto:stolowski@gmail.com\">stolowski@gmail.com</a>", QPixmap(":/images/qcomicbook-splash.png"));
+                        "QComicBook " VERSION " - comic book viewer<br>"
+                        "Copyright (C) 2005-2016 Pawel Stolowski, 2026 Valerio Perticone<br>"
+                        "Released under the GNU General Public License version 2<br><br>"
+                        "Original project: <a href=\"https://github.com/stolowski/QComicBook\">https://github.com/stolowski/QComicBook</a><br>"
+                        "Current project: <a href=\"https://github.com/valepert/QComicBook\">https://github.com/valepert/QComicBook</a>", QPixmap(":/images/qcomicbook-splash.png"));
         win->show();
 }
 
