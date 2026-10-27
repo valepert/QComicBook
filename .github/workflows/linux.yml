@@ -96,3 +96,30 @@ jobs:
               echo "$(basename "$target") at scale $scale: ok"
             done
           done
+
+      - name: Smoke test CBT
+        run: |
+          # the folder of images packed with tar: the app must keep running
+          # and extract all the pages into its temporary folder
+          comic="$RUNNER_TEMP/pages.cbt"
+          tar -cf "$comic" -C "$RUNNER_TEMP/pages" .
+          tmp="$RUNNER_TEMP/tmp-cbt"
+          log="$RUNNER_TEMP/smoke.log"
+          mkdir -p "$tmp"
+          TMPDIR="$tmp" QT_QPA_PLATFORM=offscreen ./build/src/qcomicbook "$comic" > "$log" 2>&1 &
+          pid=$!
+          sleep 5
+          if ! kill -0 "$pid" 2> /dev/null; then
+            cat "$log"
+            echo "::error::qcomicbook exited early opening pages.cbt"
+            exit 1
+          fi
+          kill "$pid"
+          wait "$pid" || true
+          pages=$(find "$tmp" -name '*.png' | wc -l)
+          if [ "$pages" -ne 3 ]; then
+            cat "$log"
+            echo "::error::pages.cbt: extracted $pages pages, expected 3"
+            exit 1
+          fi
+          echo "pages.cbt: ok"
