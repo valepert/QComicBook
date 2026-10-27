@@ -8,3 +8,5 @@ CMakeCache.txt
 *.cmake
 *.qm
 qcomicbook
+build/
+.DS_Store
